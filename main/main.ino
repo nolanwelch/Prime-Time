@@ -16,7 +16,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org");
 #define SECS_IN_MIN 60
 #define SECS_IN_HR 3600
 #define SECS_IN_DAY 86400
-#define TIME_OFFSET -18000 // Replace with your offset from GMT in minutes
+#define TIME_OFFSET 0 // Replace with your offset from GMT in minutes
 struct tm currTime;
 int lastSec = -1;
 bool isNextPrime = false;
