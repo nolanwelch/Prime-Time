@@ -7,8 +7,8 @@
 
 //#define PT_DEBUG
 
-char* ssid = "22-23-UNC-PSK";
-const char* password = "ReachHighAndDreamBig";
+char* ssid = "YourWiFiNameHere";
+const char* password = "YourPasswordHere";
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org");
@@ -16,7 +16,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org");
 #define SECS_IN_MIN 60
 #define SECS_IN_HR 3600
 #define SECS_IN_DAY 86400
-#define TIME_OFFSET -18000
+#define TIME_OFFSET -18000 // Replace with your offset from GMT in minutes
 struct tm currTime;
 int lastSec = -1;
 bool isNextPrime = false;
