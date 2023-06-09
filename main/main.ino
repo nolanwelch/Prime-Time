@@ -10,16 +10,18 @@
 char* ssid = "YourWiFiNameHere";
 const char* password = "YourPasswordHere";
 
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org");
-
 #define SECS_IN_MIN 60
 #define SECS_IN_HR 3600
 #define SECS_IN_DAY 86400
-#define GMT_OFFSET_SECS 0 // Replace with your offset from GMT in seconds
+#define GMT_OFFSET 0 // Offset from GMT in seconds
+#define SYNC_INTERVAL 30000 // NTP fetch interval in ms
+#define RESYNC_SLEEP 300000 // Time to sleep after failed sync in ms
 struct tm currTime;
 int lastSec = -1;
 bool isNextPrime = false;
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", GMT_OFFSET, SYNC_INTERVAL);
 
 bool isPrime(unsigned long n) {
   if (n <= 3) {
@@ -64,10 +66,9 @@ void setup() {
     delay(500);
   }
   Serial.print("\n");
-  Serial.println("Internet connection successful. Syncing RTC with NTP server...");
+  Serial.println("Internet connection successful. Starting NTP client...");
   timeClient.begin();
-  timeClient.setTimeOffset(GMT_OFFSET_SECS);
-  Serial.println("RTC synced with NTP server. Setup complete.");
+  Serial.println("NTP client started. Setup complete.");
 }
 #else
 void setup() {
@@ -80,12 +81,20 @@ void setup() {
     delay(500);
   }
   timeClient.begin();
-  timeClient.setTimeOffset(GMT_OFFSET_SECS);
 }
 #endif
 
 void loop() {
-  timeClient.update();
+  bool updated = timeClient.update();
+  
+  if (!updated) {
+    #ifdef PT_DEBUG
+    Serial.println("Unable to sync client with NTP server. Sleeping before reattempting.");
+    #endif
+    delay(RESYNC_SLEEP);
+    continue;
+  }
+
   time_t epochTime = timeClient.getEpochTime();
   struct tm *currTime = gmtime ((time_t *)&epochTime);
   int currSec = currTime->tm_sec;
