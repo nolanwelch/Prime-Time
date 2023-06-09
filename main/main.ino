@@ -16,7 +16,7 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org");
 #define SECS_IN_MIN 60
 #define SECS_IN_HR 3600
 #define SECS_IN_DAY 86400
-#define TIME_OFFSET_SECS 0 // Replace with your offset from GMT in seconds
+#define GMT_OFFSET_SECS 0 // Replace with your offset from GMT in seconds
 struct tm currTime;
 int lastSec = -1;
 bool isNextPrime = false;
@@ -66,7 +66,7 @@ void setup() {
   Serial.print("\n");
   Serial.println("Internet connection successful. Syncing RTC with NTP server...");
   timeClient.begin();
-  timeClient.setTimeOffset(TIME_OFFSET_SECS);
+  timeClient.setTimeOffset(GMT_OFFSET_SECS);
   Serial.println("RTC synced with NTP server. Setup complete.");
 }
 #else
@@ -80,7 +80,7 @@ void setup() {
     delay(500);
   }
   timeClient.begin();
-  timeClient.setTimeOffset(TIME_OFFSET_SECS);
+  timeClient.setTimeOffset(GMT_OFFSET_SECS);
 }
 #endif
 
