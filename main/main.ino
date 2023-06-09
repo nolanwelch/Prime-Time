@@ -46,51 +46,47 @@ void turnOffLED() {
   digitalWrite(LED, LOW);
 }
 
-#ifdef PT_DEBUG
+void debugPrint(var val) {
+  #ifdef PT_DEBUG
+  Serial.print(val);
+  #endif
+}
+
+void debugPrintln(var val) {
+  #ifdef PT_DEBUG
+  Serial.println(val);
+  #endif
+}
+
 void setup() {
   delay(1000);
   pinMode(LED, OUTPUT);
   turnOffLED();
   Serial.begin(115200);
-  Serial.println("Beginning setup...");
-  Serial.print("Joining WiFi network with SSID ");
-  Serial.print(ssid);
-  Serial.print(" and password ");
-  Serial.print(password);
-  Serial.print("...\n");
+  debugPrintln("Beginning setup...");
+  debugPrint("Joining WiFi network with SSID ");
+  debugPrint(ssid);
+  debugPrint(" and password ");
+  debugPrint(password);
+  debugPrint("...\n");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.print("Connected to WiFi network. Checking WiFi for successful Internet connection");
+  debugPrint("Connected to WiFi network. Checking WiFi for successful Internet connection");
   while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
+    debugPrint(".");
     delay(500);
   }
-  Serial.print("\n");
-  Serial.println("Internet connection successful. Starting NTP client...");
+  debugPrint("\n");
+  debugPrintln("Internet connection successful. Starting NTP client...");
   timeClient.begin();
-  Serial.println("NTP client started. Setup complete.");
+  debugPrintln("NTP client started. Setup complete.");
 }
-#else
-void setup() {
-  delay(1000);
-  pinMode(LED, OUTPUT);
-  turnOffLED();
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-  }
-  timeClient.begin();
-}
-#endif
 
 void loop() {
   bool updated = timeClient.update();
   
   if (!updated) {
-    #ifdef PT_DEBUG
-    Serial.println("Unable to sync client with NTP server. Sleeping before reattempting.");
-    #endif
+    debugPrintln("Unable to sync client with NTP server. Sleeping before reattempting.");
     delay(RESYNC_SLEEP);
     continue;
   }
@@ -110,13 +106,11 @@ void loop() {
     unsigned long nextSecsIntoYear = 1 + currSec + (currTime->tm_min*SECS_IN_MIN) + (currTime->tm_hour*SECS_IN_HR) + (currTime->tm_yday*SECS_IN_DAY);
     isNextPrime = isPrime(nextSecsIntoYear);
     
-    #ifdef PT_DEBUG
-    Serial.print("Next secs: ");
-    Serial.print(nextSecsIntoYear);
+    debugPrint("Next secs: ");
+    debugPrint(nextSecsIntoYear);
     if (isNextPrime) {
-      Serial.print(" [PRIME]");
+      debugPrint(" [PRIME]");
     }
-    Serial.println();
-    #endif
+    debugPrintln();
   }
 }
