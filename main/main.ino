@@ -60,11 +60,18 @@ void debugPrintln(var val) {
   return;
 }
 
+void debugBeginSerial(long speed) {
+  #ifdef PT_DEBUG
+  Serial.begin(speed);
+  #endif
+  return;
+}
+
 void setup() {
   delay(1000);
   pinMode(LED, OUTPUT);
   turnOffLED();
-  Serial.begin(115200);
+  debugBeginSerial(115200);
   debugPrintln("Beginning setup...");
   debugPrint("Joining WiFi network with SSID ");
   debugPrint(ssid);
