@@ -50,12 +50,14 @@ void debugPrint(var val) {
   #ifdef PT_DEBUG
   Serial.print(val);
   #endif
+  return;
 }
 
 void debugPrintln(var val) {
   #ifdef PT_DEBUG
   Serial.println(val);
   #endif
+  return;
 }
 
 void setup() {
