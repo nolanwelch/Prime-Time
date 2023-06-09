@@ -7,7 +7,7 @@
 
 //#define PT_DEBUG
 
-char* ssid = "YourWiFiNameHere";
+char* ssid = "YourNetworkNameHere";
 const char* password = "YourPasswordHere";
 
 #define SECS_IN_MIN 60
@@ -15,7 +15,7 @@ const char* password = "YourPasswordHere";
 #define SECS_IN_DAY 86400
 #define GMT_OFFSET 0 // Offset from GMT in seconds
 #define SYNC_INTERVAL 30000 // NTP fetch interval in ms
-#define RESYNC_SLEEP 300000 // Time to sleep after failed sync in ms
+#define RESYNC_SLEEP 60000 // Time to sleep after failed sync in ms
 struct tm currTime;
 int lastSec = -1;
 bool isNextPrime = false;
@@ -46,14 +46,21 @@ void turnOffLED() {
   digitalWrite(LED, LOW);
 }
 
-void debugPrint(var val) {
+void debugPrint(char* val) {
   #ifdef PT_DEBUG
   Serial.print(val);
   #endif
   return;
 }
 
-void debugPrintln(var val) {
+void debugPrint(int val) {
+  #ifdef PT_DEBUG
+  Serial.print(val);
+  #endif
+  return;
+}
+
+void debugPrintln(char* val) {
   #ifdef PT_DEBUG
   Serial.println(val);
   #endif
@@ -73,11 +80,9 @@ void setup() {
   turnOffLED();
   debugBeginSerial(115200);
   debugPrintln("Beginning setup...");
-  debugPrint("Joining WiFi network with SSID ");
+  debugPrint("Joining WiFi network '");
   debugPrint(ssid);
-  debugPrint(" and password ");
-  debugPrint(password);
-  debugPrint("...\n");
+  debugPrint("'...\n");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   debugPrint("Connected to WiFi network. Checking WiFi for successful Internet connection");
@@ -92,13 +97,12 @@ void setup() {
 }
 
 void loop() {
-  bool updated = timeClient.update();
-  
-  if (!updated) {
+  while (WiFi.status() != WL_CONNECTED) {
     debugPrintln("Unable to sync client with NTP server. Sleeping before reattempting.");
     delay(RESYNC_SLEEP);
-    continue;
   }
+  
+  timeClient.update();
 
   time_t epochTime = timeClient.getEpochTime();
   struct tm *currTime = gmtime ((time_t *)&epochTime);
@@ -120,6 +124,6 @@ void loop() {
     if (isNextPrime) {
       debugPrint(" [PRIME]");
     }
-    debugPrintln();
+    debugPrintln("");
   }
 }
