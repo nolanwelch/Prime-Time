@@ -116,7 +116,10 @@ void loop() {
       turnOffLED();
     }
     
-    unsigned long nextSecsIntoYear = 1 + currSec + (currTime->tm_min*SECS_IN_MIN) + (currTime->tm_hour*SECS_IN_HR) + (currTime->tm_yday*SECS_IN_DAY);
+    unsigned long nextSecsIntoYear = 1 + currSec + 
+                  (currTime->tm_min*SECS_IN_MIN) + 
+                  (currTime->tm_hour*SECS_IN_HR) + 
+                  (currTime->tm_yday*SECS_IN_DAY);
     isNextPrime = isPrime(nextSecsIntoYear);
     
     debugPrint("Next secs: ");
